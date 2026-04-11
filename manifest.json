@@ -34,12 +34,5 @@
       "description": "Open Authenticator"
     }
   },
-  "options_page": "settings/settings.html",
-  "content_scripts": [
-    {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["content-autofill.js"],
-      "run_at": "document_idle"
-    }
-  ]
+  "options_page": "settings/settings.html"
 }

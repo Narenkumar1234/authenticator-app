@@ -67,7 +67,7 @@
     <ul>
       <li><strong>Account data:</strong> Service names (issuers), account labels, and TOTP/HOTP secret keys that you add manually or via QR code scanning.</li>
       <li><strong>Settings:</strong> Your preferences such as theme, auto-copy, and auto-fill settings.</li>
-      <li><strong>Encryption metadata:</strong> If you set a master password, a cryptographic salt and encrypted verification token are stored to enable password verification. The master password itself is never stored.</li>
+      <li><strong>Encryption metadata:</strong> If you set a master password, a cryptographic salt and encrypted verification token are stored persistently to enable password verification. The master password itself is never written to disk. For the 24-hour unlock window, the password is held in <code>chrome.storage.session</code> (Chrome's in-memory-only storage that is never persisted to disk and is cleared automatically when the browser quits).</li>
     </ul>
     <p>All data is stored locally using <code>chrome.storage.local</code>. If you enable the optional Chrome Sync feature (disabled by default), account data (including encrypted secrets) is synced across your Chrome browsers via Google's built-in sync infrastructure, subject to Google's own privacy policies. No third-party servers are involved.</p>
   </div>
@@ -78,7 +78,7 @@
       <li>No browsing history, search queries, or web activity is collected or stored.</li>
       <li>No personal information (name, email, address, etc.) is collected.</li>
       <li>No analytics, telemetry, or usage tracking data is collected.</li>
-      <li>No data is transmitted to any external server, third-party service, or remote endpoint.</li>
+      <li>No data is transmitted to any third-party server or remote endpoint. If you enable optional Chrome Sync, account data is replicated through Google's built-in sync infrastructure — no other external services are involved.</li>
       <li>No advertising data is collected or used.</li>
     </ul>
   </div>
@@ -86,23 +86,24 @@
   <div class="section">
     <h2>Auto-Fill Feature</h2>
     <p>
-      When the auto-fill feature is enabled, the Extension's content script runs on web pages to detect 2FA input fields
-      (e.g., fields with <code>autocomplete="one-time-code"</code> or matching common OTP patterns). When a matching input is found:
+      The Extension provides a "Autofill 2FA Code" context-menu item that appears when you right-click an input field.
+      This uses Chrome's <code>activeTab</code> and <code>scripting</code> permissions to fill a code <strong>only</strong> into the field you right-clicked,
+      and <strong>only</strong> when you explicitly trigger it. No content script runs in the background on any page.
     </p>
     <ul>
-      <li>The page's hostname is sent to the Extension's background service worker to find a matching account.</li>
+      <li>The current page's hostname is matched against your account issuers to find a relevant code.</li>
       <li>The hostname is used solely for real-time matching and is <strong>never stored, logged, or transmitted</strong>.</li>
-      <li>A confirmation banner is shown to the user before any code is filled — no automatic filling occurs without user action.</li>
+      <li>No page content, DOM data, or browsing activity is read or collected.</li>
     </ul>
-    <p>You can disable the auto-fill feature at any time in the Extension's Settings.</p>
+    <p>You can disable the context-menu autofill feature at any time in the Extension's Settings.</p>
   </div>
 
   <div class="section">
     <h2>Encryption and Security</h2>
     <ul>
       <li>TOTP/HOTP secrets can be encrypted at rest using AES-256-GCM with a key derived from your master password via PBKDF2 (100,000 iterations, SHA-256).</li>
-      <li>The master password is never stored in any form. Only a cryptographic salt and an encrypted verification token are persisted.</li>
-      <li>Session keys are held in memory only and are cleared when the browser restarts or the session expires (24 hours).</li>
+      <li>The master password is never written to disk. A cryptographic salt and an encrypted verification token are persisted to verify the password. For the 24-hour unlock window, the password is held in <code>chrome.storage.session</code>, Chrome's in-memory-only storage that is automatically cleared on browser quit and is never saved to disk.</li>
+      <li>The derived decryption key is held in the popup's in-memory JS context and is lost when the popup closes. It is re-derived from the session-stored password on each reopen, until the 24-hour window expires or the browser restarts.</li>
       <li>Exported backups are encrypted with a separate user-provided password using the same AES-256-GCM scheme.</li>
       <li>All cryptographic operations use the Web Crypto API — no third-party cryptographic libraries are used.</li>
     </ul>
@@ -114,9 +115,9 @@
     <ul>
       <li><strong>storage:</strong> To save your accounts and settings locally.</li>
       <li><strong>clipboardWrite:</strong> To copy generated codes to your clipboard.</li>
-      <li><strong>activeTab:</strong> To capture the current tab for QR code scanning (only when you initiate a scan).</li>
+      <li><strong>activeTab:</strong> To capture the current tab for QR code scanning and to fill 2FA codes via the context menu (granted only when you interact with the extension).</li>
       <li><strong>contextMenus:</strong> To provide a right-click "Autofill 2FA Code" option on input fields.</li>
-      <li><strong>scripting:</strong> To fill 2FA codes into input fields when you use the autofill or context menu features.</li>
+      <li><strong>scripting:</strong> To fill 2FA codes into the input field you right-clicked.</li>
     </ul>
   </div>
 
