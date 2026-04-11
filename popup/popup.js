@@ -912,6 +912,79 @@ function showSuccessTick() {
   });
 }
 
+// --- Autofill Picker (multi-account context menu flow) ---
+
+const $autofillPicker = document.getElementById('autofill-picker');
+const $autofillPickerList = document.getElementById('autofill-picker-list');
+
+function closeAutofillPicker() {
+  $autofillPicker.classList.add('hidden');
+  $autofillPickerList.innerHTML = '';
+  chrome.storage.session.remove(['autofill_codes', 'autofill_tabId']);
+}
+
+document.getElementById('btn-picker-close').addEventListener('click', closeAutofillPicker);
+$autofillPicker.addEventListener('click', (e) => {
+  if (e.target === $autofillPicker) closeAutofillPicker();
+});
+
+/**
+ * Check if the popup was opened for an autofill pick, and show the picker.
+ */
+async function checkAutofillPicker() {
+  const data = await chrome.storage.session.get(['autofill_codes', 'autofill_tabId']);
+  const codes = data.autofill_codes;
+  const tabId = data.autofill_tabId;
+  if (!codes || !codes.length || !tabId) return false;
+
+  // Build picker list
+  $autofillPickerList.innerHTML = codes.map((entry) => {
+    const color = getIssuerColor(entry.issuer);
+    const initials = getInitials(entry.issuer);
+    const masked = entry.code.slice(0, 3) + '***';
+    return `
+      <button class="picker-item" data-code="${escapeHtml(entry.code)}" data-tab="${tabId}">
+        <div class="account-avatar" style="background:${color}">${initials}</div>
+        <div class="picker-item-info">
+          <div class="picker-item-issuer">${escapeHtml(entry.issuer)}</div>
+          <div class="picker-item-label">${escapeHtml(entry.label)}</div>
+        </div>
+        <div class="picker-item-code">${masked}</div>
+      </button>`;
+  }).join('');
+
+  // Handle clicks
+  $autofillPickerList.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.picker-item');
+    if (!btn) return;
+    const code = btn.dataset.code;
+    const tid = parseInt(btn.dataset.tab, 10);
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tid },
+        func: (c) => {
+          const el = document.activeElement;
+          if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+            el.value = c;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        },
+        args: [code],
+      });
+      showToast('Code filled');
+    } catch {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(code);
+      showToast('Copied (could not fill — try pasting)');
+    }
+    closeAutofillPicker();
+  });
+
+  $autofillPicker.classList.remove('hidden');
+  return true;
+}
+
 // --- Refresh Loop ---
 
 function startRefreshLoop() {
@@ -924,6 +997,9 @@ function startRefreshLoop() {
 // --- Init ---
 
 async function init() {
+  // Check if we were opened for an autofill pick (multi-account context menu)
+  const isPickerMode = await checkAutofillPicker();
+
   // Load user settings
   const settingsResult = await chrome.storage.local.get('authenticator_settings');
   const settings = settingsResult['authenticator_settings'] || {};
@@ -939,7 +1015,7 @@ async function init() {
       accounts = await getDecryptedAccounts();
       startRefreshLoop();
     } else {
-      showLockScreen(false);
+      if (!isPickerMode) showLockScreen(false);
     }
   } else {
     // No master password — skip lock screen, go straight to accounts

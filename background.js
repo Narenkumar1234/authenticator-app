@@ -4,6 +4,102 @@
 
 const SETTINGS_KEY = 'authenticator_settings';
 
+// --- Crypto helpers for decrypting secrets in background context ---
+// The background service worker needs to decrypt secrets when a master
+// password is active. It reads the session password from chrome.storage.session
+// (set by the popup on unlock) and re-derives the CryptoKey.
+
+const BG_CRYPTO_STORAGE_KEY = 'authenticator_crypto';
+const BG_PBKDF2_ITERATIONS = 100000;
+const BG_SALT_BYTES = 16;
+const BG_IV_BYTES = 12;
+const BG_VERIFICATION_TOKEN = 'authenticator-verified';
+const BG_SESSION_PW_KEY = 'authenticator_session_pw';
+const BG_SESSION_TS_KEY = 'authenticator_session_ts';
+const BG_SESSION_DURATION = 24 * 60 * 60 * 1000;
+
+function bgBufToBase64(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+
+function bgBase64ToBuf(b64) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+
+async function bgDeriveKey(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: BG_PBKDF2_ITERATIONS, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function bgDecryptString(key, { iv, ciphertext }) {
+  const dec = new TextDecoder();
+  const plainBuf = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: bgBase64ToBuf(iv) },
+    key,
+    bgBase64ToBuf(ciphertext)
+  );
+  return dec.decode(plainBuf);
+}
+
+/**
+ * Try to get the decryption key from the session password.
+ * Returns null if no session is active or password is invalid.
+ */
+async function bgGetSessionKey() {
+  const sessionData = await chrome.storage.session.get([BG_SESSION_PW_KEY, BG_SESSION_TS_KEY]);
+  const pw = sessionData[BG_SESSION_PW_KEY];
+  const ts = sessionData[BG_SESSION_TS_KEY];
+  if (!pw || !ts) return null;
+  if ((Date.now() - ts) >= BG_SESSION_DURATION) return null;
+
+  const cryptoData = await chrome.storage.local.get(BG_CRYPTO_STORAGE_KEY);
+  const cd = cryptoData[BG_CRYPTO_STORAGE_KEY];
+  if (!cd || !cd.salt) return null;
+
+  const salt = bgBase64ToBuf(cd.salt);
+  const key = await bgDeriveKey(pw, salt);
+
+  // Verify the key is correct
+  try {
+    const dec = new TextDecoder();
+    const plainBuf = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: bgBase64ToBuf(cd.verification.iv) },
+      key,
+      bgBase64ToBuf(cd.verification.ciphertext)
+    );
+    if (dec.decode(plainBuf) === BG_VERIFICATION_TOKEN) return key;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Decrypt a single account's secret if it is encrypted.
+ * Returns the plaintext secret string, or null if decryption fails.
+ */
+async function bgDecryptSecret(account, decryptionKey) {
+  if (typeof account.secret === 'string') return account.secret;
+  if (!account.secret || !account.secret.iv || !decryptionKey) return null;
+  try {
+    return await bgDecryptString(decryptionKey, account.secret);
+  } catch {
+    return null;
+  }
+}
+
 // --- Context Menu ---
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -24,12 +120,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const accounts = result.authenticator_accounts || [];
     if (accounts.length === 0) return;
 
-    // For each account, generate the code (need totp logic in SW)
+    // Try to get decryption key from session (if master password is active)
+    const decryptionKey = await bgGetSessionKey();
+
+    // For each account, generate the code
     const codes = [];
     for (const account of accounts) {
-      let secret = account.secret;
-      // If secret is encrypted, we can't decode without the session key
-      if (typeof secret === 'object' && secret.iv) continue;
+      const secret = await bgDecryptSecret(account, decryptionKey);
+      if (!secret) continue; // can't decrypt — skip
 
       try {
         const code = await generateOTPCode(secret, account);
@@ -217,13 +315,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
       }
 
-      // Only works for unencrypted secrets
-      if (typeof match.secret === 'object' && match.secret.iv) {
+      // Decrypt if needed
+      const decryptionKey = await bgGetSessionKey();
+      const secret = await bgDecryptSecret(match, decryptionKey);
+      if (!secret) {
         sendResponse(null);
         return;
       }
 
-      const code = await generateOTPCode(match.secret, match);
+      const code = await generateOTPCode(secret, match);
       sendResponse({ code, issuer: match.issuer });
     } catch {
       sendResponse(null);

@@ -54,8 +54,10 @@
       and how it is protected.
     </p>
     <div class="highlight">
-      <strong>Key principle:</strong> The Extension operates entirely locally on your device.
+      <strong>Key principle:</strong> The Extension operates entirely on your device.
       No account data, secrets, or personal information is ever transmitted to external servers.
+      Optional Chrome Sync uses Google's built-in sync infrastructure to replicate data across
+      your own signed-in browsers — it is disabled by default and no third-party servers are involved.
     </div>
   </div>
 
@@ -67,7 +69,7 @@
       <li><strong>Settings:</strong> Your preferences such as theme, auto-copy, and auto-fill settings.</li>
       <li><strong>Encryption metadata:</strong> If you set a master password, a cryptographic salt and encrypted verification token are stored to enable password verification. The master password itself is never stored.</li>
     </ul>
-    <p>All data is stored locally using <code>chrome.storage.local</code>. If you enable Chrome Sync, account data (including encrypted secrets) may be synced across your Chrome browsers via your Google account, subject to Google's own privacy policies.</p>
+    <p>All data is stored locally using <code>chrome.storage.local</code>. If you enable the optional Chrome Sync feature (disabled by default), account data (including encrypted secrets) is synced across your Chrome browsers via Google's built-in sync infrastructure, subject to Google's own privacy policies. No third-party servers are involved.</p>
   </div>
 
   <div class="section">

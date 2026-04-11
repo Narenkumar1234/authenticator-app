@@ -334,6 +334,22 @@
   <!-- Toast notification -->
   <div id="toast" class="toast hidden"></div>
 
+  <!-- Autofill Picker (shown when context menu finds multiple accounts) -->
+  <div id="autofill-picker" class="form-overlay hidden">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Choose Account to Fill</h2>
+        <button id="btn-picker-close" class="btn-icon" title="Close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="autofill-picker-list" class="picker-list"></div>
+    </div>
+  </div>
+
   <script src="../lib/totp.js"></script>
   <script src="../lib/crypto.js"></script>
   <script src="../lib/storage.js"></script>
