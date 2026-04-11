@@ -1,5 +1,5 @@
 /**
- * Background service worker — context menu autofill, domain autofill, and keyboard shortcut support.
+ * Background service worker — context-menu autofill and background OTP generation.
  */
 
 const SETTINGS_KEY = 'authenticator_settings';
@@ -232,71 +232,4 @@ async function generateOTPCode(secret, account) {
   const truncated = ((sig[offset] & 0x7f) << 24) | ((sig[offset+1] & 0xff) << 16) | ((sig[offset+2] & 0xff) << 8) | (sig[offset+3] & 0xff);
   return (truncated % Math.pow(10, digits)).toString().padStart(digits, '0');
 }
-
-// --- Domain-to-issuer matching for content script autofill ---
-
-/**
- * Known mappings from common hostnames → issuer names.
- * Falls back to fuzzy substring matching against issuer for unknown domains.
- */
-const DOMAIN_ALIASES = {
-  'accounts.google.com': ['google'],
-  'github.com': ['github'],
-  'login.microsoftonline.com': ['microsoft'],
-  'amazon.com': ['amazon', 'aws'],
-  'signin.aws.amazon.com': ['aws', 'amazon'],
-  'facebook.com': ['facebook', 'meta'],
-  'twitter.com': ['twitter', 'x'],
-  'x.com': ['twitter', 'x'],
-  'login.live.com': ['microsoft', 'outlook', 'hotmail'],
-  'discord.com': ['discord'],
-  'accounts.snapchat.com': ['snapchat'],
-  'id.apple.com': ['apple'],
-  'dropbox.com': ['dropbox'],
-  'slack.com': ['slack'],
-  'gitlab.com': ['gitlab'],
-  'bitbucket.org': ['bitbucket', 'atlassian'],
-  'id.atlassian.com': ['atlassian', 'jira', 'bitbucket'],
-  'linkedin.com': ['linkedin'],
-  'twitch.tv': ['twitch'],
-  'store.steampowered.com': ['steam'],
-  'login.yahoo.com': ['yahoo'],
-};
-
-/**
- * Match a hostname to an account issuer.
- * Returns the best matching account or null.
- */
-function matchDomainToAccount(hostname, accounts) {
-  const host = hostname.toLowerCase();
-
-  // 1. Try exact domain-alias lookup
-  for (const [domain, aliases] of Object.entries(DOMAIN_ALIASES)) {
-    if (host === domain || host.endsWith('.' + domain)) {
-      for (const account of accounts) {
-        const issuerLower = (account.issuer || '').toLowerCase();
-        if (aliases.some((alias) => issuerLower.includes(alias))) {
-          return account;
-        }
-      }
-    }
-  }
-
-  // 2. Fuzzy: check if the main domain word appears in any issuer
-  //    e.g. "login.example.com" → "example" matches issuer "Example Corp"
-  const parts = host.split('.');
-  // Get the main domain part (e.g. "github" from "github.com")
-  const domainWord = parts.length >= 2 ? parts[parts.length - 2] : parts[0];
-  if (domainWord.length >= 3) {
-    for (const account of accounts) {
-      const issuerLower = (account.issuer || '').toLowerCase();
-      if (issuerLower.includes(domainWord)) {
-        return account;
-      }
-    }
-  }
-
-  return null;
-}
-
 
