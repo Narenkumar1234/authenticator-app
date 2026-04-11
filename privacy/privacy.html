@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Authenticator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a2e;
+      --muted: #666;
+      --border: #e0e0e0;
+      --accent: #4f8cff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 40px 24px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    .last-updated { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+    h2 { font-size: 18px; margin-top: 28px; margin-bottom: 8px; }
+    p, li { font-size: 15px; margin-bottom: 12px; }
+    ul { padding-left: 24px; }
+    li { margin-bottom: 8px; }
+    strong { font-weight: 600; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .section { margin-bottom: 24px; }
+    .highlight {
+      background: #f0f4ff;
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: April 11, 2026</p>
+
+  <div class="section">
+    <h2>Overview</h2>
+    <p>
+      Authenticator ("the Extension") is a two-factor authentication (2FA) code generator for TOTP and HOTP standards.
+      Your privacy and security are our top priorities. This policy describes what data the Extension collects, how it is used,
+      and how it is protected.
+    </p>
+    <div class="highlight">
+      <strong>Key principle:</strong> The Extension operates entirely locally on your device.
+      No account data, secrets, or personal information is ever transmitted to external servers.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Data Collection and Storage</h2>
+    <p>The Extension stores the following data locally on your device using Chrome's built-in storage APIs:</p>
+    <ul>
+      <li><strong>Account data:</strong> Service names (issuers), account labels, and TOTP/HOTP secret keys that you add manually or via QR code scanning.</li>
+      <li><strong>Settings:</strong> Your preferences such as theme, auto-copy, and auto-fill settings.</li>
+      <li><strong>Encryption metadata:</strong> If you set a master password, a cryptographic salt and encrypted verification token are stored to enable password verification. The master password itself is never stored.</li>
+    </ul>
+    <p>All data is stored locally using <code>chrome.storage.local</code>. If you enable Chrome Sync, account data (including encrypted secrets) may be synced across your Chrome browsers via your Google account, subject to Google's own privacy policies.</p>
+  </div>
+
+  <div class="section">
+    <h2>Data the Extension Does NOT Collect</h2>
+    <ul>
+      <li>No browsing history, search queries, or web activity is collected or stored.</li>
+      <li>No personal information (name, email, address, etc.) is collected.</li>
+      <li>No analytics, telemetry, or usage tracking data is collected.</li>
+      <li>No data is transmitted to any external server, third-party service, or remote endpoint.</li>
+      <li>No advertising data is collected or used.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Auto-Fill Feature</h2>
+    <p>
+      When the auto-fill feature is enabled, the Extension's content script runs on web pages to detect 2FA input fields
+      (e.g., fields with <code>autocomplete="one-time-code"</code> or matching common OTP patterns). When a matching input is found:
+    </p>
+    <ul>
+      <li>The page's hostname is sent to the Extension's background service worker to find a matching account.</li>
+      <li>The hostname is used solely for real-time matching and is <strong>never stored, logged, or transmitted</strong>.</li>
+      <li>A confirmation banner is shown to the user before any code is filled — no automatic filling occurs without user action.</li>
+    </ul>
+    <p>You can disable the auto-fill feature at any time in the Extension's Settings.</p>
+  </div>
+
+  <div class="section">
+    <h2>Encryption and Security</h2>
+    <ul>
+      <li>TOTP/HOTP secrets can be encrypted at rest using AES-256-GCM with a key derived from your master password via PBKDF2 (100,000 iterations, SHA-256).</li>
+      <li>The master password is never stored in any form. Only a cryptographic salt and an encrypted verification token are persisted.</li>
+      <li>Session keys are held in memory only and are cleared when the browser restarts or the session expires (24 hours).</li>
+      <li>Exported backups are encrypted with a separate user-provided password using the same AES-256-GCM scheme.</li>
+      <li>All cryptographic operations use the Web Crypto API — no third-party cryptographic libraries are used.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Permissions Used</h2>
+    <p>The Extension requests only the permissions necessary for its core functionality:</p>
+    <ul>
+      <li><strong>storage:</strong> To save your accounts and settings locally.</li>
+      <li><strong>clipboardWrite:</strong> To copy generated codes to your clipboard.</li>
+      <li><strong>activeTab:</strong> To capture the current tab for QR code scanning (only when you initiate a scan).</li>
+      <li><strong>contextMenus:</strong> To provide a right-click "Autofill 2FA Code" option on input fields.</li>
+      <li><strong>scripting:</strong> To fill 2FA codes into input fields when you use the autofill or context menu features.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Third-Party Data Sharing</h2>
+    <p>
+      The Extension does <strong>not</strong> share, sell, transfer, or disclose any user data to third parties.
+      No data is used for advertising, analytics, or any purpose other than providing the Extension's core 2FA functionality.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Chrome Web Store User Data Policy Compliance</h2>
+    <div class="highlight">
+      The use of information received from Chrome APIs adheres to the
+      <a href="https://developer.chrome.com/docs/webstore/program-policies/user-data-faq" target="_blank" rel="noopener noreferrer">Chrome Web Store User Data Policy</a>,
+      including the Limited Use requirements.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Data Deletion</h2>
+    <p>You can delete all Extension data at any time by going to Settings → Clear All Data, or by uninstalling the Extension. Uninstalling the Extension removes all locally stored data.</p>
+  </div>
+
+  <div class="section">
+    <h2>Changes to This Policy</h2>
+    <p>If this privacy policy is updated, the changes will be reflected on this page with an updated "Last updated" date. Continued use of the Extension after changes constitutes acceptance of the updated policy.</p>
+  </div>
+
+  <div class="section">
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy or the Extension's data practices, please open an issue on the Extension's support page or contact the developer through the Chrome Web Store listing.</p>
+  </div>
+</body>
+</html>
