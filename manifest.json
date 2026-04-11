@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Authenticator",
   "version": "1.1.0",
-  "description": "Two-factor authentication code generator — TOTP & HOTP (RFC 6238/4226) with autofill, QR scanning, and encrypted backup. Data stored locally with optional Chrome Sync.",
+  "description": "Local TOTP & HOTP authenticator with QR import, encrypted storage, backups, optional Chrome Sync, and autofill.",
   "permissions": [
     "storage",
     "clipboardWrite",
