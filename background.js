@@ -115,6 +115,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab?.id) return;
 
   try {
+    // Check if autofill is enabled in settings
+    const settingsResult = await chrome.storage.local.get(SETTINGS_KEY);
+    const settings = settingsResult[SETTINGS_KEY] || {};
+    if (settings.autoFill === false) return;
+
     // Get accounts and generate codes
     const result = await chrome.storage.local.get('authenticator_accounts');
     const accounts = result.authenticator_accounts || [];
