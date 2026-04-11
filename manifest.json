@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Authenticator",
+  "version": "1.1.0",
+  "description": "Two-factor authentication code generator — TOTP & HOTP (RFC 6238/4226) with autofill, sync, and encrypted backup",
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "activeTab",
+    "contextMenus",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+A"
+      },
+      "description": "Open Authenticator"
+    }
+  },
+  "options_page": "settings/settings.html",
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content-autofill.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
