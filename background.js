@@ -100,14 +100,28 @@ async function bgDecryptSecret(account, decryptionKey) {
   }
 }
 
-// --- Context Menu ---
+// --- Context Menu (created / removed dynamically based on setting) ---
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: 'autofill-2fa',
-    title: 'Autofill 2FA Code',
-    contexts: ['editable'],
-  });
+async function ensureContextMenu() {
+  const { [SETTINGS_KEY]: settings = {} } = await chrome.storage.local.get(SETTINGS_KEY);
+  const enabled = settings.autoFill !== false; // default true
+  // Remove first to avoid duplicate-ID errors
+  try { await chrome.contextMenus.remove('autofill-2fa'); } catch { /* not present */ }
+  if (enabled) {
+    chrome.contextMenus.create({
+      id: 'autofill-2fa',
+      title: 'Autofill 2FA Code',
+      contexts: ['editable'],
+    });
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => ensureContextMenu());
+chrome.runtime.onStartup.addListener(() => ensureContextMenu());
+
+// Listen for setting changes so the menu appears/disappears immediately
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes[SETTINGS_KEY]) ensureContextMenu();
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -115,11 +129,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!tab?.id) return;
 
   try {
-    // Check if autofill is enabled in settings
-    const settingsResult = await chrome.storage.local.get(SETTINGS_KEY);
-    const settings = settingsResult[SETTINGS_KEY] || {};
-    if (settings.autoFill === false) return;
-
     // Get accounts and generate codes
     const result = await chrome.storage.local.get('authenticator_accounts');
     const accounts = result.authenticator_accounts || [];
