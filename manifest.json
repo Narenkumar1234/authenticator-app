@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Authenticator - 2FA & TOTP Code Generator",
   "version": "1.1.2",
-  "description": "Two-factor authenticator (2FA) with TOTP & HOTP code generation, QR code scanning, one-click autofill, encrypted backups, and Chrome Sync. Secure, fast, and open-source OTP manager.",
+  "description": "2FA & TOTP authenticator code generator with QR scanning, smart 1-click autofill, encrypted backups, and optional Chrome Sync.",
   "permissions": [
     "storage",
     "clipboardWrite",
