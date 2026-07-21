@@ -935,3 +935,15 @@ body {
   font-family: 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
   white-space: nowrap;
 }
+
+#picker-search-bar {
+  padding: 0 0 12px 0;
+}
+
+#picker-search-bar .search-icon {
+  left: 10px;
+}
+
+#picker-search-bar input {
+  padding-left: 32px;
+}

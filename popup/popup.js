@@ -13,6 +13,7 @@ const $inputIssuer = document.getElementById('input-issuer');
 const $inputLabel = document.getElementById('input-label');
 const $inputSecret = document.getElementById('input-secret');
 const $secretField = document.getElementById('secret-field');
+const $inputWebsites = document.getElementById('input-websites');
 const $deleteDialog = document.getElementById('delete-dialog');
 const $deleteAccountName = document.getElementById('delete-account-name');
 const $toast = document.getElementById('toast');
@@ -166,6 +167,37 @@ async function renderAccounts() {
     })
   );
 
+  // Check if we can do an in-place update
+  const currentNodes = Array.from($accountList.children);
+  const canUpdateInPlace = currentNodes.length === entries.length && 
+    entries.every((entry, i) => currentNodes[i].dataset.id === entry.account.id);
+
+  if (canUpdateInPlace) {
+    // Just update the code and progress bar
+    entries.forEach((entry, i) => {
+      const node = currentNodes[i];
+      const isHotp = entry.opts.type === 'hotp';
+      const pct = isHotp ? 100 : (entry.remaining / entry.opts.period) * 100;
+      const urgent = !isHotp && entry.remaining <= 5;
+      
+      const codeEl = node.querySelector('.account-code');
+      if (codeEl) codeEl.textContent = formatCode(entry.code);
+      
+      const fillEl = node.querySelector('.countdown-fill');
+      if (fillEl) {
+        fillEl.style.width = `${pct}%`;
+        if (urgent) fillEl.classList.add('urgent');
+        else fillEl.classList.remove('urgent');
+      }
+      
+      // Update copy button code attribute
+      const copyBtn = node.querySelector('.btn-copy');
+      if (copyBtn) copyBtn.dataset.code = entry.code;
+    });
+    return;
+  }
+
+  // Full re-render
   $accountList.innerHTML = entries
     .map(({ account, code, remaining, opts }) => {
       const color = getIssuerColor(account.issuer);
@@ -280,6 +312,7 @@ function openAddForm() {
   $inputIssuer.value = '';
   $inputLabel.value = '';
   $inputSecret.value = '';
+  $inputWebsites.value = '';
   $secretField.classList.remove('hidden');
   resetAdvancedFields();
   $formOverlay.classList.remove('hidden');
@@ -294,6 +327,7 @@ function openEditForm(id) {
   $inputIssuer.value = account.issuer;
   $inputLabel.value = account.label;
   $inputSecret.value = '';
+  $inputWebsites.value = (account.websites || []).join(', ');
   // Hide secret field when editing (can't change secret)
   $secretField.classList.add('hidden');
   $inputSecret.removeAttribute('required');
@@ -332,11 +366,17 @@ async function handleFormSubmit(e) {
     counter: parseInt($inputCounter.value, 10) || 0,
   };
 
+  const websitesRaw = $inputWebsites.value;
+  const websites = websitesRaw
+    ? websitesRaw.split(',').map(s => s.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')).filter(Boolean)
+    : [];
+
   if (editingId) {
     // Update existing
     await updateAccount(editingId, {
       issuer: $inputIssuer.value,
       label: $inputLabel.value,
+      websites,
       ...advancedData,
     });
     showToast('Account updated');
@@ -355,6 +395,7 @@ async function handleFormSubmit(e) {
       issuer: $inputIssuer.value,
       label: $inputLabel.value,
       secret: $inputSecret.value,
+      websites,
       ...advancedData,
     });
     showToast('Account added');
@@ -916,10 +957,17 @@ function showSuccessTick() {
 
 const $autofillPicker = document.getElementById('autofill-picker');
 const $autofillPickerList = document.getElementById('autofill-picker-list');
+const $pickerSearchInput = document.getElementById('picker-search-input');
+
+let activePickerCodes = [];
+let activePickerTabId = null;
 
 function closeAutofillPicker() {
   $autofillPicker.classList.add('hidden');
   $autofillPickerList.innerHTML = '';
+  if ($pickerSearchInput) $pickerSearchInput.value = '';
+  activePickerCodes = [];
+  activePickerTabId = null;
   chrome.storage.session.remove(['autofill_codes', 'autofill_tabId']);
 }
 
@@ -927,6 +975,52 @@ document.getElementById('btn-picker-close').addEventListener('click', closeAutof
 $autofillPicker.addEventListener('click', (e) => {
   if (e.target === $autofillPicker) closeAutofillPicker();
 });
+
+// Focus search input when the picker opens
+function focusPickerSearch() {
+  if ($pickerSearchInput) {
+    $pickerSearchInput.focus();
+  }
+}
+
+// Render the filtered picker list
+function renderPickerList(query = '') {
+  const cleanQuery = query.toLowerCase().trim();
+  const filtered = activePickerCodes.filter((entry) => {
+    if (!cleanQuery) return true;
+    return (
+      entry.issuer.toLowerCase().includes(cleanQuery) ||
+      entry.label.toLowerCase().includes(cleanQuery)
+    );
+  });
+
+  if (filtered.length === 0) {
+    $autofillPickerList.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;font-size:13px;">No matching accounts</div>';
+    return;
+  }
+
+  $autofillPickerList.innerHTML = filtered.map((entry) => {
+    const color = getIssuerColor(entry.issuer);
+    const initials = getInitials(entry.issuer);
+    const masked = entry.code.slice(0, 3) + '***';
+    return `
+      <button class="picker-item" data-code="${escapeHtml(entry.code)}" data-tab="${activePickerTabId}">
+        <div class="account-avatar" style="background:${color}">${initials}</div>
+        <div class="picker-item-info">
+          <div class="picker-item-issuer">${escapeHtml(entry.issuer)}</div>
+          <div class="picker-item-label">${escapeHtml(entry.label)}</div>
+        </div>
+        <div class="picker-item-code">${masked}</div>
+      </button>`;
+  }).join('');
+}
+
+// Bind search input listener
+if ($pickerSearchInput) {
+  $pickerSearchInput.addEventListener('input', (e) => {
+    renderPickerList(e.target.value);
+  });
+}
 
 /**
  * Check if the popup was opened for an autofill pick, and show the picker.
@@ -937,21 +1031,11 @@ async function checkAutofillPicker() {
   const tabId = data.autofill_tabId;
   if (!codes || !codes.length || !tabId) return false;
 
-  // Build picker list
-  $autofillPickerList.innerHTML = codes.map((entry) => {
-    const color = getIssuerColor(entry.issuer);
-    const initials = getInitials(entry.issuer);
-    const masked = entry.code.slice(0, 3) + '***';
-    return `
-      <button class="picker-item" data-code="${escapeHtml(entry.code)}" data-tab="${tabId}">
-        <div class="account-avatar" style="background:${color}">${initials}</div>
-        <div class="picker-item-info">
-          <div class="picker-item-issuer">${escapeHtml(entry.issuer)}</div>
-          <div class="picker-item-label">${escapeHtml(entry.label)}</div>
-        </div>
-        <div class="picker-item-code">${masked}</div>
-      </button>`;
-  }).join('');
+  activePickerCodes = codes;
+  activePickerTabId = tabId;
+
+  // Initial render of the picker list
+  renderPickerList('');
 
   // Handle clicks
   $autofillPickerList.addEventListener('click', async (e) => {
@@ -963,11 +1047,51 @@ async function checkAutofillPicker() {
       await chrome.scripting.executeScript({
         target: { tabId: tid },
         func: (c) => {
-          const el = document.activeElement;
+          const el = window.__authenticatorTarget || document.activeElement;
           if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
-            el.value = c;
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLInputElement.prototype, 'value'
+            )?.set;
+            const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
+              window.HTMLTextAreaElement.prototype, 'value'
+            )?.set;
+
+            if (el.tagName === 'INPUT' && nativeInputValueSetter) {
+              nativeInputValueSetter.call(el, c);
+            } else if (el.tagName === 'TEXTAREA' && nativeTextAreaValueSetter) {
+              nativeTextAreaValueSetter.call(el, c);
+            } else {
+              el.value = c;
+            }
+
             el.dispatchEvent(new Event('input', { bubbles: true }));
             el.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Auto-submit
+            el.focus();
+            setTimeout(() => {
+              const form = el.closest('form');
+              if (form) {
+                const submitBtn = form.querySelector(
+                  'button[type="submit"], input[type="submit"], button:not([type])'
+                );
+                if (submitBtn) { submitBtn.click(); return; }
+                form.requestSubmit ? form.requestSubmit() : form.submit();
+                return;
+              }
+              el.dispatchEvent(new KeyboardEvent('keydown', {
+                key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
+              }));
+              el.dispatchEvent(new KeyboardEvent('keypress', {
+                key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
+              }));
+              el.dispatchEvent(new KeyboardEvent('keyup', {
+                key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
+              }));
+            }, 100);
+          }
+          if (window.__authenticatorTarget) {
+            delete window.__authenticatorTarget;
           }
         },
         args: [code],
@@ -982,6 +1106,7 @@ async function checkAutofillPicker() {
   });
 
   $autofillPicker.classList.remove('hidden');
+  setTimeout(focusPickerSearch, 100); // Wait for transition/render
   return true;
 }
 

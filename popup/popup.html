@@ -131,6 +131,11 @@
           <input type="text" id="input-secret" placeholder="Base32 encoded secret" required
                  pattern="[A-Za-z2-7\s=]+" title="Base32 characters only (A-Z, 2-7)">
         </div>
+        <div class="form-field">
+          <label for="input-websites">Website / Domain <span style="font-weight:normal;opacity:0.6">(optional)</span></label>
+          <input type="text" id="input-websites" placeholder="e.g. github.com, gitlab.com" maxlength="512">
+          <small style="display:block;margin-top:3px;opacity:0.55;font-size:11px;">Comma-separated. Used for smart autofill matching.</small>
+        </div>
         <button type="button" class="btn-advanced-toggle" id="btn-advanced-toggle">
           <span id="advanced-arrow">&#9654;</span> Advanced Options
         </button>
@@ -345,6 +350,14 @@
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
+      </div>
+      <!-- Search bar inside picker -->
+      <div class="search-bar" id="picker-search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="picker-search-input" placeholder="Search accounts..." autocomplete="off">
       </div>
       <div id="autofill-picker-list" class="picker-list"></div>
     </div>
