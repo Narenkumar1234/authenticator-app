@@ -942,6 +942,8 @@ body {
 
 #picker-search-bar .search-icon {
   left: 10px;
+  top: 8px;
+  transform: none;
 }
 
 #picker-search-bar input {
