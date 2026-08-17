@@ -307,16 +307,11 @@ function resetAdvancedFields() {
 }
 
 function openAddForm() {
-  editingId = null;
-  $formTitle.textContent = 'Add Account';
-  $inputIssuer.value = '';
-  $inputLabel.value = '';
-  $inputSecret.value = '';
-  $inputWebsites.value = '';
-  $secretField.classList.remove('hidden');
-  resetAdvancedFields();
-  $formOverlay.classList.remove('hidden');
-  $inputIssuer.focus();
+  // Open the Add Account page in a new tab so users can freely
+  // switch tabs/apps to copy the secret key without losing the form.
+  // (Chrome extension popups close when they lose focus.)
+  chrome.tabs.create({ url: chrome.runtime.getURL('add-account/add-account.html') });
+  window.close();
 }
 
 function openEditForm(id) {

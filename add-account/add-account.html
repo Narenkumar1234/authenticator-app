@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Account — Authenticator</title>
+  <link rel="stylesheet" href="add-account.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <svg class="header-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <h1>Add Account</h1>
+        </div>
+      </div>
+
+      <!-- Lock screen (shown if master password is required) -->
+      <div id="lock-section" class="lock-section hidden">
+        <svg class="lock-icon" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <p class="lock-label">Enter your master password to continue</p>
+        <form id="lock-form" autocomplete="off">
+          <div class="form-field">
+            <input type="password" id="lock-password" placeholder="Master password" required minlength="4">
+          </div>
+          <p id="lock-error" class="lock-error hidden"></p>
+          <button type="submit" class="btn-primary btn-full">Unlock</button>
+        </form>
+      </div>
+
+      <!-- Add Account form -->
+      <form id="account-form" class="account-form hidden" autocomplete="off">
+        <div class="form-field">
+          <label for="input-issuer">Service</label>
+          <input type="text" id="input-issuer" placeholder="e.g. Google, GitHub" required maxlength="64" autofocus>
+        </div>
+        <div class="form-field">
+          <label for="input-label">Account</label>
+          <input type="text" id="input-label" placeholder="e.g. user@example.com" required maxlength="128">
+        </div>
+        <div class="form-field">
+          <label for="input-secret">Secret Key</label>
+          <input type="text" id="input-secret" placeholder="Base32 encoded secret — paste it here" required
+                 pattern="[A-Za-z2-7\s=]+" title="Base32 characters only (A-Z, 2-7)">
+          <small class="field-hint">💡 You can freely switch tabs to copy the secret key — this page won't close.</small>
+        </div>
+        <div class="form-field">
+          <label for="input-websites">Website / Domain <span class="optional">(optional)</span></label>
+          <input type="text" id="input-websites" placeholder="e.g. github.com, gitlab.com" maxlength="512">
+          <small class="field-hint">Comma-separated. Used for smart autofill matching.</small>
+        </div>
+
+        <button type="button" class="btn-advanced-toggle" id="btn-advanced-toggle">
+          <span id="advanced-arrow">&#9654;</span> Advanced Options
+        </button>
+        <div id="advanced-fields" class="advanced-fields hidden">
+          <div class="form-row">
+            <div class="form-field form-field-half">
+              <label for="input-type">Type</label>
+              <select id="input-type">
+                <option value="totp" selected>TOTP</option>
+                <option value="hotp">HOTP</option>
+              </select>
+            </div>
+            <div class="form-field form-field-half">
+              <label for="input-algorithm">Algorithm</label>
+              <select id="input-algorithm">
+                <option value="SHA-1" selected>SHA-1</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-512">SHA-512</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field form-field-half">
+              <label for="input-digits">Digits</label>
+              <select id="input-digits">
+                <option value="6" selected>6</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+            <div class="form-field form-field-half" id="period-field">
+              <label for="input-period">Period (sec)</label>
+              <input type="number" id="input-period" value="30" min="10" max="120" step="1">
+            </div>
+          </div>
+          <div class="form-field hidden" id="counter-field">
+            <label for="input-counter">Initial Counter</label>
+            <input type="number" id="input-counter" value="0" min="0" step="1">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary btn-full" id="btn-save">Save Account</button>
+      </form>
+
+      <!-- Success state -->
+      <div id="success-state" class="success-state hidden">
+        <div class="success-circle">
+          <svg viewBox="0 0 24 24">
+            <polyline class="tick-path" points="4 12 10 18 20 6"/>
+          </svg>
+        </div>
+        <h2 class="success-title">Account Added!</h2>
+        <p class="success-sub">Your account has been saved. You can close this tab.</p>
+        <div class="success-actions">
+          <button id="btn-add-another" class="btn-secondary">Add Another</button>
+          <button id="btn-close-tab" class="btn-primary">Close Tab</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="../lib/totp.js"></script>
+  <script src="../lib/crypto.js"></script>
+  <script src="../lib/storage.js"></script>
+  <script src="add-account.js"></script>
+</body>
+</html>
