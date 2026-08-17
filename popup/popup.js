@@ -452,6 +452,17 @@ document.getElementById('btn-add').addEventListener('click', openAddForm);
 // Add button (empty state)
 document.getElementById('btn-add-empty').addEventListener('click', openAddForm);
 
+// Buy me a coffee links (popup footer and floating widget)
+['link-bmc', 'link-bmc-floating'].forEach((id) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      chrome.tabs.create({ url: 'https://buymeacoffee.com/narenkumar' });
+    });
+  }
+});
+
 // Scan QR button (empty state)
 document.getElementById('btn-scan-empty').addEventListener('click', openScanOverlay);
 

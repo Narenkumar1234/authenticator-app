@@ -1,78 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Authenticator</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="app-shell">
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        <svg class="header-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
         <h1 class="header-title">Authenticator</h1>
       </div>
       <div class="header-right">
         <button id="btn-scan-qr" class="btn-icon" title="Scan QR Code">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-            <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-            <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-            <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-            <line x1="7" y1="12" x2="17" y2="12"/>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+            <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+            <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+            <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+            <line x1="7" y1="12" x2="17" y2="12" />
           </svg>
         </button>
         <button id="btn-add" class="btn-icon" title="Add account">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
         <button id="btn-settings" class="btn-icon" title="Settings">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
           </svg>
         </button>
         <div class="kebab-wrapper">
           <button id="btn-kebab" class="btn-icon" title="More options">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <circle cx="12" cy="5" r="2"/>
-              <circle cx="12" cy="12" r="2"/>
-              <circle cx="12" cy="19" r="2"/>
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
             </svg>
           </button>
           <div id="kebab-menu" class="kebab-menu hidden">
             <button class="kebab-item" id="menu-import-export">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               Import / Export
             </button>
             <button class="kebab-item" id="menu-lock">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
               Lock
             </button>
             <button class="kebab-item" id="menu-theme">
-              <svg id="menu-theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              <svg id="menu-theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
               </svg>
-              <svg id="menu-theme-icon-moon" class="hidden" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              <svg id="menu-theme-icon-moon" class="hidden" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
               <span id="menu-theme-label">Dark Mode</span>
             </button>
@@ -83,9 +94,10 @@
 
     <!-- Search bar -->
     <div class="search-bar">
-      <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
       <input type="text" id="search-input" placeholder="Search accounts..." autocomplete="off">
     </div>
@@ -95,15 +107,38 @@
 
     <!-- Empty state -->
     <div id="empty-state" class="empty-state hidden">
-      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"
+        opacity="0.4">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
       <p>No accounts yet</p>
       <button id="btn-add-empty" class="btn-primary">Add your first account</button>
       <button id="btn-scan-empty" class="btn-secondary">Scan QR Code</button>
     </div>
+
+    <!-- Footer / Buy me a coffee (shown in compact popup) -->
+    <footer class="app-footer">
+      <a href="https://buymeacoffee.com/narenkumar" target="_blank" rel="noopener noreferrer" class="bmc-button"
+        id="link-bmc" title="Support me on Buy me a coffee!">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+          <path
+            d="M20.216 6.415l-.132-.666c-.119-.597-.386-1.144-.772-1.583a3.528 3.528 0 0 0-1.637-.991C16.892 2.94 15.347 2.8 12.016 2.8c-3.33 0-4.876.14-5.659.375a3.528 3.528 0 0 0-1.637.991c-.386.439-.653.986-.772 1.583l-.132.666C3.12 7.02 2.8 8.16 2.8 9.5c0 3.032 1.944 5.602 4.673 6.435.617.935 1.517 1.69 2.585 2.167V20H8.5a.75.75 0 0 0 0 1.5h7a.75.75 0 0 0 0-1.5h-1.558v-1.898c1.068-.477 1.968-1.232 2.585-2.167 2.729-.833 4.673-3.403 4.673-6.435 0-1.34-.32-2.48-.984-3.085zM12.016 4.3c3.08 0 4.416.128 4.984.3.418.127.755.372.977.71.222.337.318.752.27 1.17l-.12.607a10.87 10.87 0 0 1-6.111.413 10.87 10.87 0 0 1-6.111-.413l-.12-.607c-.048-.418.048-.833.27-1.17.222-.338.559-.583.977-.71.568-.172 1.904-.3 4.984-.3zm-6.28 10.375c-2.148-.68-3.436-2.616-3.436-4.675 0-.75.148-1.383.473-1.865a7.35 7.35 0 0 0 2.963.633c0 2.052 0 4.025 0 5.907zm9.6 0c0-1.882 0-3.855 0-5.907a7.35 7.35 0 0 0 2.963-.633c.325.482.473 1.115.473 1.865 0 2.059-1.288 3.995-3.436 4.675zm-1.5-1.175H10.18v-4.5h3.656v4.5z" />
+        </svg>
+        <span>Buy me a coffee</span>
+      </a>
+    </footer>
   </div>
+
+  <!-- Floating Buy Me a Coffee Widget (shown in full view at bottom right: x=18, y=18) -->
+  <a href="https://buymeacoffee.com/narenkumar" target="_blank" rel="noopener noreferrer" class="bmc-floating-widget"
+    id="link-bmc-floating" title="Support me on Buy me a coffee!">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+      <path
+        d="M20.216 6.415l-.132-.666c-.119-.597-.386-1.144-.772-1.583a3.528 3.528 0 0 0-1.637-.991C16.892 2.94 15.347 2.8 12.016 2.8c-3.33 0-4.876.14-5.659.375a3.528 3.528 0 0 0-1.637.991c-.386.439-.653.986-.772 1.583l-.132.666C3.12 7.02 2.8 8.16 2.8 9.5c0 3.032 1.944 5.602 4.673 6.435.617.935 1.517 1.69 2.585 2.167V20H8.5a.75.75 0 0 0 0 1.5h7a.75.75 0 0 0 0-1.5h-1.558v-1.898c1.068-.477 1.968-1.232 2.585-2.167 2.729-.833 4.673-3.403 4.673-6.435 0-1.34-.32-2.48-.984-3.085zM12.016 4.3c3.08 0 4.416.128 4.984.3.418.127.755.372.977.71.222.337.318.752.27 1.17l-.12.607a10.87 10.87 0 0 1-6.111.413 10.87 10.87 0 0 1-6.111-.413l-.12-.607c-.048-.418.048-.833.27-1.17.222-.338.559-.583.977-.71.568-.172 1.904-.3 4.984-.3zm-6.28 10.375c-2.148-.68-3.436-2.616-3.436-4.675 0-.75.148-1.383.473-1.865a7.35 7.35 0 0 0 2.963.633c0 2.052 0 4.025 0 5.907zm9.6 0c0-1.882 0-3.855 0-5.907a7.35 7.35 0 0 0 2.963-.633c.325.482.473 1.115.473 1.865 0 2.059-1.288 3.995-3.436 4.675zm-1.5-1.175H10.18v-4.5h3.656v4.5z" />
+    </svg>
+    <span>Buy me a coffee</span>
+  </a>
 
   <!-- Add / Edit Account Form (overlay) -->
   <div id="form-overlay" class="form-overlay hidden">
@@ -112,8 +147,8 @@
         <h2 id="form-title">Add Account</h2>
         <button id="btn-form-close" class="btn-icon" title="Close">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -128,13 +163,15 @@
         </div>
         <div class="form-field" id="secret-field">
           <label for="input-secret">Secret Key</label>
-          <input type="text" id="input-secret" placeholder="Base32 encoded secret" required
-                 pattern="[A-Za-z2-7\s=]+" title="Base32 characters only (A-Z, 2-7)">
+          <input type="text" id="input-secret" placeholder="Base32 encoded secret" required pattern="[A-Za-z2-7\s=]+"
+            title="Base32 characters only (A-Z, 2-7)">
         </div>
         <div class="form-field">
-          <label for="input-websites">Website / Domain <span style="font-weight:normal;opacity:0.6">(optional)</span></label>
+          <label for="input-websites">Website / Domain <span
+              style="font-weight:normal;opacity:0.6">(optional)</span></label>
           <input type="text" id="input-websites" placeholder="e.g. github.com, gitlab.com" maxlength="512">
-          <small style="display:block;margin-top:3px;opacity:0.55;font-size:11px;">Comma-separated. Used for smart autofill matching.</small>
+          <small style="display:block;margin-top:3px;opacity:0.55;font-size:11px;">Comma-separated. Used for smart
+            autofill matching.</small>
         </div>
         <button type="button" class="btn-advanced-toggle" id="btn-advanced-toggle">
           <span id="advanced-arrow">&#9654;</span> Advanced Options
@@ -195,9 +232,10 @@
   <!-- Lock Screen -->
   <div id="lock-screen" class="lock-screen hidden">
     <div class="lock-content">
-      <svg class="lock-icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      <svg class="lock-icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor"
+        stroke-width="1.5" opacity="0.5">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
       <h2 id="lock-title">Unlock Authenticator</h2>
       <p id="lock-subtitle" class="lock-sub">Enter your master password</p>
@@ -222,8 +260,8 @@
         <h2>Import / Export</h2>
         <button id="btn-ie-close" class="btn-icon" title="Close">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -284,8 +322,8 @@
         <h2>Scan QR Code</h2>
         <button id="btn-scan-close" class="btn-icon" title="Close">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
@@ -329,7 +367,7 @@
       <div id="success-overlay" class="scan-success hidden">
         <div class="success-circle">
           <svg viewBox="0 0 24 24">
-            <polyline class="tick-path" points="4 12 10 18 20 6"/>
+            <polyline class="tick-path" points="4 12 10 18 20 6" />
           </svg>
         </div>
       </div>
@@ -346,16 +384,17 @@
         <h2>Choose Account to Fill</h2>
         <button id="btn-picker-close" class="btn-icon" title="Close">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       </div>
       <!-- Search bar inside picker -->
       <div class="search-bar" id="picker-search-bar">
-        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
         <input type="text" id="picker-search-input" placeholder="Search accounts..." autocomplete="off">
       </div>
@@ -370,4 +409,5 @@
   <script src="../lib/qr-scanner.js"></script>
   <script src="popup.js"></script>
 </body>
+
 </html>

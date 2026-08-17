@@ -959,6 +959,54 @@ body {
   padding-left: 32px;
 }
 
+/* ===== App Footer / Buy Me a Coffee (Popup bottom) ===== */
+.app-footer {
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.bmc-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background-color: #40DCA5;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(64, 220, 165, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.bmc-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(64, 220, 165, 0.45);
+  opacity: 0.95;
+}
+
+.bmc-button:active {
+  transform: translateY(0);
+}
+
+.bmc-button svg {
+  flex-shrink: 0;
+}
+
+/* Floating widget hidden by default in compact popup */
+.bmc-floating-widget {
+  display: none !important;
+}
+
 /* ===== Standalone Tab / Window View ===== */
 @media (min-width: 450px) {
   body {
@@ -991,6 +1039,47 @@ body {
 
   [data-theme="dark"] .app-shell {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* In full tab view, hide in-card footer and show bottom-right floating widget */
+  .app-footer {
+    display: none !important;
+  }
+
+  .bmc-floating-widget {
+    display: flex !important;
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    align-items: center;
+    gap: 8px;
+    background-color: #40DCA5;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(64, 220, 165, 0.45);
+    z-index: 90;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, opacity 0.15s ease;
+  }
+
+  .bmc-floating-widget:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 24px rgba(64, 220, 165, 0.6);
+    opacity: 0.97;
+  }
+
+  .bmc-floating-widget:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .bmc-floating-widget svg {
+    flex-shrink: 0;
   }
 
   .form-overlay {
