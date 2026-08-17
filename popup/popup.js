@@ -452,14 +452,7 @@ document.getElementById('btn-add').addEventListener('click', openAddForm);
 // Add button (empty state)
 document.getElementById('btn-add-empty').addEventListener('click', openAddForm);
 
-// Buy me a coffee link (compact popup footer)
-const $linkBmc = document.getElementById('link-bmc');
-if ($linkBmc) {
-  $linkBmc.addEventListener('click', (e) => {
-    e.preventDefault();
-    chrome.tabs.create({ url: 'https://buymeacoffee.com/narenkumar' });
-  });
-}
+
 
 // Floating BMC widget toggle (full tab view)
 const $btnBmcToggle = document.getElementById('btn-bmc-toggle');
