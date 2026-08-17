@@ -12,8 +12,18 @@ const SETTINGS_KEY = 'authenticator_settings';
 async function ensureContextMenu() {
   const { [SETTINGS_KEY]: settings = {} } = await chrome.storage.local.get(SETTINGS_KEY);
   const enabled = settings.autoFill !== false; // default true
+
   // Remove first to avoid duplicate-ID errors
+  try { await chrome.contextMenus.remove('open-in-tab'); } catch { /* not present */ }
   try { await chrome.contextMenus.remove('autofill-2fa'); } catch { /* not present */ }
+
+  // Action context menu: right-click toolbar icon to open in new tab
+  chrome.contextMenus.create({
+    id: 'open-in-tab',
+    title: 'Open in new tab',
+    contexts: ['action'],
+  });
+
   if (enabled) {
     chrome.contextMenus.create({
       id: 'autofill-2fa',
@@ -32,6 +42,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === 'open-in-tab') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup/popup.html') });
+    return;
+  }
+
   if (info.menuItemId !== 'autofill-2fa') return;
   if (!tab?.id) return;
 
