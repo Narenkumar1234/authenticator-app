@@ -463,6 +463,10 @@ const $bmcIconChevron = document.getElementById('bmc-icon-chevron');
 if ($btnBmcToggle && $bmcContainer) {
   $btnBmcToggle.addEventListener('click', (e) => {
     e.stopPropagation();
+    const frame = document.getElementById('bmc-widget-frame');
+    if (frame && !frame.src && frame.dataset.src) {
+      frame.src = frame.dataset.src;
+    }
     const isHidden = $bmcContainer.classList.toggle('hidden');
     if ($bmcIconCoffee && $bmcIconChevron) {
       $bmcIconCoffee.classList.toggle('hidden', !isHidden);
