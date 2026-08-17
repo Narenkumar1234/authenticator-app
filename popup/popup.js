@@ -307,11 +307,30 @@ function resetAdvancedFields() {
 }
 
 function openAddForm() {
-  // Open the Add Account page in a new tab so users can freely
-  // switch tabs/apps to copy the secret key without losing the form.
-  // (Chrome extension popups close when they lose focus.)
-  chrome.tabs.create({ url: chrome.runtime.getURL('add-account/add-account.html') });
-  window.close();
+  const isStandaloneTab = window.innerWidth > 420;
+  if (!isStandaloneTab) {
+    // If inside compact popup, open in tab so switching windows won't lose the form
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup/popup.html?add=1') });
+    window.close();
+    return;
+  }
+
+  // Inside standalone tab — show the drawer directly
+  showAddDrawer();
+}
+
+function showAddDrawer() {
+  editingId = null;
+  $formTitle.textContent = 'Add Account';
+  $inputIssuer.value = '';
+  $inputLabel.value = '';
+  $inputSecret.value = '';
+  $inputWebsites.value = '';
+  $secretField.classList.remove('hidden');
+  $inputSecret.setAttribute('required', '');
+  resetAdvancedFields();
+  $formOverlay.classList.remove('hidden');
+  $inputIssuer.focus();
 }
 
 function openEditForm(id) {
@@ -700,6 +719,7 @@ $lockForm.addEventListener('submit', async (e) => {
       showToast('Master password set');
       accounts = await getDecryptedAccounts();
       startRefreshLoop();
+      checkAutoOpenAdd();
     } catch (err) {
       showLockError('Setup failed. Try again.');
     }
@@ -718,6 +738,7 @@ $lockForm.addEventListener('submit', async (e) => {
       hideLockScreen();
       accounts = await getDecryptedAccounts();
       startRefreshLoop();
+      checkAutoOpenAdd();
     } catch {
       showLockError('Unlock failed. Try again.');
     }
@@ -729,6 +750,7 @@ $btnSkipSetup.addEventListener('click', async () => {
   hideLockScreen();
   accounts = await getDecryptedAccounts();
   startRefreshLoop();
+  checkAutoOpenAdd();
 });
 
 // --- Import / Export ---
@@ -1116,6 +1138,13 @@ function startRefreshLoop() {
 
 // --- Init ---
 
+function checkAutoOpenAdd() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('add') === '1') {
+    showAddDrawer();
+  }
+}
+
 async function init() {
   // Check if we were opened for an autofill pick (multi-account context menu)
   const isPickerMode = await checkAutofillPicker();
@@ -1134,6 +1163,7 @@ async function init() {
       setSessionKey(restoredKey);
       accounts = await getDecryptedAccounts();
       startRefreshLoop();
+      checkAutoOpenAdd();
     } else {
       if (!isPickerMode) showLockScreen(false);
     }
@@ -1141,6 +1171,7 @@ async function init() {
     // No master password — skip lock screen, go straight to accounts
     accounts = await getDecryptedAccounts();
     startRefreshLoop();
+    checkAutoOpenAdd();
   }
 }
 
