@@ -974,23 +974,23 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background-color: #40DCA5;
-  color: #ffffff;
-  padding: 6px 14px;
+  background-color: #FFDD00;
+  color: #000000;
+  padding: 7px 16px;
   border-radius: 20px;
   font-family: var(--font);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.2px;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(64, 220, 165, 0.3);
+  box-shadow: 0 3px 10px rgba(255, 221, 0, 0.45);
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 .bmc-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(64, 220, 165, 0.45);
+  box-shadow: 0 5px 14px rgba(255, 221, 0, 0.6);
   opacity: 0.95;
 }
 
@@ -1000,6 +1000,7 @@ body {
 
 .bmc-button svg {
   flex-shrink: 0;
+  fill: #000000;
 }
 
 /* Floating button & widget hidden by default in compact popup */
@@ -1055,20 +1056,20 @@ body {
     width: 54px;
     height: 54px;
     border-radius: 50%;
-    background-color: #40DCA5;
-    color: #ffffff;
+    background-color: #FFDD00;
+    color: #000000;
     border: none;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(64, 220, 165, 0.55);
+    box-shadow: 0 4px 20px rgba(255, 221, 0, 0.6);
     z-index: 1000;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background-color 0.15s ease;
   }
 
   .bmc-floating-btn:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 26px rgba(64, 220, 165, 0.7);
+    box-shadow: 0 6px 26px rgba(255, 221, 0, 0.75);
   }
 
   .bmc-floating-btn:active {
