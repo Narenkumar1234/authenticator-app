@@ -452,16 +452,42 @@ document.getElementById('btn-add').addEventListener('click', openAddForm);
 // Add button (empty state)
 document.getElementById('btn-add-empty').addEventListener('click', openAddForm);
 
-// Buy me a coffee links (popup footer and floating widget)
-['link-bmc', 'link-bmc-floating'].forEach((id) => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: 'https://buymeacoffee.com/narenkumar' });
-    });
-  }
-});
+// Buy me a coffee link (compact popup footer)
+const $linkBmc = document.getElementById('link-bmc');
+if ($linkBmc) {
+  $linkBmc.addEventListener('click', (e) => {
+    e.preventDefault();
+    chrome.tabs.create({ url: 'https://buymeacoffee.com/narenkumar' });
+  });
+}
+
+// Floating BMC widget toggle (full tab view)
+const $btnBmcToggle = document.getElementById('btn-bmc-toggle');
+const $bmcContainer = document.getElementById('bmc-widget-container');
+const $bmcIconCoffee = document.getElementById('bmc-icon-coffee');
+const $bmcIconChevron = document.getElementById('bmc-icon-chevron');
+
+if ($btnBmcToggle && $bmcContainer) {
+  $btnBmcToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isHidden = $bmcContainer.classList.toggle('hidden');
+    if ($bmcIconCoffee && $bmcIconChevron) {
+      $bmcIconCoffee.classList.toggle('hidden', !isHidden);
+      $bmcIconChevron.classList.toggle('hidden', isHidden);
+    }
+  });
+
+  // Close widget when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!$bmcContainer.contains(e.target) && e.target !== $btnBmcToggle && !$btnBmcToggle.contains(e.target)) {
+      $bmcContainer.classList.add('hidden');
+      if ($bmcIconCoffee && $bmcIconChevron) {
+        $bmcIconCoffee.classList.remove('hidden');
+        $bmcIconChevron.classList.add('hidden');
+      }
+    }
+  });
+}
 
 // Scan QR button (empty state)
 document.getElementById('btn-scan-empty').addEventListener('click', openScanOverlay);

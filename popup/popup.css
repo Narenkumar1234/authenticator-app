@@ -1002,8 +1002,9 @@ body {
   flex-shrink: 0;
 }
 
-/* Floating widget hidden by default in compact popup */
-.bmc-floating-widget {
+/* Floating button & widget hidden by default in compact popup */
+.bmc-floating-btn,
+.bmc-widget-container {
   display: none !important;
 }
 
@@ -1041,45 +1042,78 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
-  /* In full tab view, hide in-card footer and show bottom-right floating widget */
+  /* In full tab view, hide in-card footer and show bottom-right floating button & widget */
   .app-footer {
     display: none !important;
   }
 
-  .bmc-floating-widget {
+  .bmc-floating-btn {
     display: flex !important;
     position: fixed;
     bottom: 18px;
     right: 18px;
-    align-items: center;
-    gap: 8px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
     background-color: #40DCA5;
     color: #ffffff;
-    padding: 10px 18px;
-    border-radius: 30px;
-    font-family: var(--font);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    text-decoration: none;
+    border: none;
     cursor: pointer;
-    box-shadow: 0 4px 18px rgba(64, 220, 165, 0.45);
-    z-index: 90;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, opacity 0.15s ease;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(64, 220, 165, 0.55);
+    z-index: 1000;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, background-color 0.15s ease;
   }
 
-  .bmc-floating-widget:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 24px rgba(64, 220, 165, 0.6);
-    opacity: 0.97;
+  .bmc-floating-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 26px rgba(64, 220, 165, 0.7);
   }
 
-  .bmc-floating-widget:active {
-    transform: translateY(0) scale(0.98);
+  .bmc-floating-btn:active {
+    transform: scale(0.95);
   }
 
-  .bmc-floating-widget svg {
-    flex-shrink: 0;
+  .bmc-widget-container {
+    position: fixed;
+    bottom: 84px;
+    right: 18px;
+    width: 380px;
+    height: 590px;
+    max-height: calc(100vh - 105px);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.25), 0 3px 10px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    z-index: 999;
+    animation: bmcSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .bmc-widget-container.hidden {
+    display: none !important;
+  }
+
+  .bmc-widget-container:not(.hidden) {
+    display: block !important;
+  }
+
+  .bmc-widget-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  @keyframes bmcSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .form-overlay {
